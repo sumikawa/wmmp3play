@@ -1,0 +1,10 @@
+XPMLIB = -lXpm
+DEPLIBS = $(DEPXLIB)
+CCOPTIONS = @CFLAGS@
+LOCAL_LDFLAGS = @LDFLAGS@
+LOCAL_LIBRARIES = $(XPMLIB) $(XLIB) @LDFLAGS@ @LIBS@
+
+SRCS = wmmp3.c
+OBJS = wmmp3.o
+
+ComplexProgramTarget(wmmp3)
