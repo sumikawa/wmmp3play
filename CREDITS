@@ -1,0 +1,17 @@
+This program based on the code wriiten by:
+	wmmixer Release 1.0 Beta1
+		Sam Hawker <shawkie@geocities.com>
+
+Alphabet and numeric XPM is from:
+	WMNet-1.0(beta) - The public BETA release
+	        Richard M. Neswold, Jr. (rneswold@mcs.net)
+
+ID3 tag getting codes are from:
+	mp3info
+		Thorvald Natvig <thorvald@natvig.com>
+
+And buffering codes are from listen.c in:
+	icecast-1.3.4(http://www.icecast.org/)
+		Jack Moffitt	 <jack@linuxpower.org>
+		Barath Raghavan	 <barath@linuxpower.org>
+		Alexander Haväng <eel@musiknet.se>

@@ -19,3 +19,6 @@ getnameinfo.o: missing/getnameinfo.c
 		$(srcdir)/missing/getnameinfo.c
 
 ComplexProgramTarget(wmmp3play)
+
+README::
+	w3m -S http://www.don.to/wmmp3play/ | sed 's/  *$$//' | uniq > README

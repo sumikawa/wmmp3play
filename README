@@ -1,81 +1,73 @@
-wmmp3play - An mpg123 frontend designed for WindowMaker
-				Munechika SUMIKAWA <sumikawa@don.to>
-				http://www.don.to/wmmp3/
+            wmmp3play - An mpg123 frontend designed for WindowMaker
 
-wmmp3play is copyright (c) 1999-2003 by Munechika SUMIKAWA and licensed
-through the GNU General Public License.  Read the COPYING file for the
-complete GNU license.
+                                  [wmmp3play]
 
---------------------------------------------------------------------
-INSTALL:
+wmmp3play is an mpg123 frontend designed for WindowMaker.
 
-1. install 'mpg123' at first. You can get it from 
+wmmp3play is copyright (c) 1999-2003 by Munechika SUMIKAWA and licensed through
+the GNU General Public License. Read the COPYING file for the complete GNU
+license.
+-------------------------------------------------------------------------------
 
-2. tar zxvf wmmp3play-xxx.tar.gz
-   cd wmmp3play-xxx
-   ./configure
-   xmkmf
-   make
-   su
-   make install
+Download
 
---------------------------------------------------------------------
-USAGE:
+wmmp3play version 0.3 - download
+-------------------------------------------------------------------------------
 
-  1. make playlist on ~/.wmmp3play
+INSTALL
 
-     e.g. mp3 files are installed on /usr/local/data/mp3
-       % find /usr/local/data/mp3 -name '*.mp3' > ~/.wmmp3play
+  * install 'mpg123' first. See, http://www.mpg123.de/
+  * extract & compile & install
 
-     NOTE: All filenames are designated as a ABSOLUTELY path.
-           You can also designate URL in ~/.wmmp3play, such as
-	   http://foo.bar.baz:8000/
+    tar zxvf wmmp3play-xxx.tar.gz
+    cd wmmp3play-xxx
+    ./configure
+    xmkmf
+    make
+    su
+    make install
 
-  2. execute wmmp3play
-       % wmmp3play
+-------------------------------------------------------------------------------
 
-  3. enjoy!
+USAGE
 
---------------------------------------------------------------------
-TODO:
-  - man
-  - album support
-  - more cool frontend
-    print the all of ID3 tag by baloon help
-  - D&D playlist and calling from netscape
-  - opening message :-)
-  - use libao and libmad audio library instead of executing mpg123
+  * make playlist on ~/.wmmp3play
 
---------------------------------------------------------------------
-KNOWN BUGS:
-  - there are some problems in signal handling
+    e.g. mp3 files are installed on /usr/local/data/mp3
 
---------------------------------------------------------------------
-CHANGELOG:
-  0.1
-    - First release
-  0.2
-    - Confgure support
-    - Networks streaming(including IPv6) support
-  0.3
-    - Renamed from wmmp3
+    % find /usr/local/data/mp3 -name '*.mp3' > ~/.wmmp3play
 
---------------------------------------------------------------------
-CREDITS:
-This program based on the code wriiten by:
-	wmmixer Release 1.0 Beta1
-		Sam Hawker <shawkie@geocities.com>
+    NOTE: All filenames are designated as a ABSOLUTELY path. And you can also
+    designate URL in ~/.wmmp3play
 
-Alphabet and numeric XPM is from:
-	WMNet-1.0(beta) - The public BETA release
-	        Richard M. Neswold, Jr. (rneswold@mcs.net)
+  * execute wmmp3play
 
-ID3 tag getting codes are from:
-	mp3info
-		Thorvald Natvig <thorvald@natvig.com>
+    % wmmp3play
 
-And buffering codes are from liten.c in:
-	icecast-1.3.4(http://www.icecast.org/)
-		Jack Moffitt	 <jack@linuxpower.org>
-		Barath Raghavan	 <barath@linuxpower.org>
-		Alexander Haväng <eel@musiknet.se>
+  * enjoy!
+
+-------------------------------------------------------------------------------
+
+TODO
+
+  * man
+  * album support
+  * more cool frontend such as printing the all fields of ID3 tag by baloon
+    help
+  * D&D playlist and calling from web browser
+  * opening message :-)
+  * use libao and libmad audio library instead of executing mpg123
+
+-------------------------------------------------------------------------------
+
+CHANGELOG
+
+  * 0.1: First Release
+  * 0.2: confgure support, networks streaming(including IPv6) support
+  * 0.3: Renamed from wmmp3
+
+$Id$
+-------------------------------------------------------------------------------
+SUMIKAWA Munechika / Daydreamers On the Net
+
+don@don.to
