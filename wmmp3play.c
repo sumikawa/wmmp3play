@@ -26,6 +26,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
+#include <sys/time.h>
 
 #include <netinet/in.h>
 #include <net/if.h>
@@ -152,6 +153,7 @@ main(int argc, char **argv)
 	XpmAttributes xpmattr;
 	XEvent xev;
 	int done, n;
+	struct timeval *tp;
 
 	scanArgs(argc, argv);
 	initXWin(argc, argv);
@@ -189,7 +191,8 @@ main(int argc, char **argv)
 	XSetClipMask(d_display, gc_gc, None);
 
 	drawBtns(STOP);
-	srandomdev();
+	gettimeofday(tp, NULL);
+	srandom(tp->tv_sec);
 	readFile();
 
 	open_music(1, 0);
@@ -382,7 +385,7 @@ freeXWin()
 }
 
 void 
-createWin(Window * win, int x, int y)
+createWin(Window *win, int x, int y)
 {
 	XClassHint classHint;
 	*win = XCreateSimpleWindow(d_display, w_root, x, y, winsize,
