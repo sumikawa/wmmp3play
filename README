@@ -32,10 +32,11 @@ USAGE:
 
   1. make playlist on ~/.wmmp3
 
-     NOTE: All filenames are designated as a ABSOLUTELY path.
-
      e.g. mp3 files are installed on /usr/local/data/mp3
-       find /usr/local/data/mp3 -name '*.mp3' > ~/.wmmp3
+       % find /usr/local/data/mp3 -name '*.mp3' > ~/.wmmp3
+
+     NOTE: All filenames are designated as a ABSOLUTELY path.
+           And you can also designate URL in ~/.wmmp3
 
   2. execute wmmp3
        % wmmp3
