@@ -96,7 +96,7 @@ pid_t child_pid;
 char curname[8];
 char title[30];
 
-#define BUFSIZE 8192
+#define BUFSIZE 1024
 char buf[BUFSIZE];
 int fdmp3 = -1, fdtitle = -1;
 int pipefds[2];
