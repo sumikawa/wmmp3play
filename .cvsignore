@@ -1,5 +1,6 @@
 config.cache
 config.log
 config.status
+config.h
 Imakefile
 Makefile
