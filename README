@@ -11,11 +11,13 @@ This program based on the code wriiten by:
 	05/09/98  Release 1.0 Beta1
 	Copyright (C) 1998  Sam Hawker <shawkie@geocities.com>
 
-And, alphabet and numeric XPMs from:
+Alphabet and numeric XPM is from:
 	WMNet-1.0(beta) - The public BETA release
         Richard M. Neswold, Jr. (rneswold@mcs.net)
 
-mp3info
+And, tag getting codes are from:
+	mp3info
+	Thorvald Natvig <thorvald@natvig.com>
 
 --------------------------------------------------------------------
 INSTALL:
@@ -51,6 +53,10 @@ TODO:
   - album support
   - more cool frontend
   - opening message
+
+--------------------------------------------------------------------
+KNOWN BUGS:
+  - In quiting wmmp3, mpg123 can not be killed.
 
 --------------------------------------------------------------------
 CHANGELOG:
