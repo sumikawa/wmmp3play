@@ -7,8 +7,8 @@ LOCAL_LDFLAGS = @LDFLAGS@
 LOCAL_LIBRARIES = $(XPMLIB) $(XLIB) @LDFLAGS@ @LIBS@
 LIBOBJS=	@LIBOBJS@
 
-SRCS = wmmp3.c
-OBJS = wmmp3.o ${LIBOBJS}
+SRCS = wmmp3play.c
+OBJS = wmmp3play.o ${LIBOBJS}
 
 # missing libraries
 getaddrinfo.o: missing/getaddrinfo.c
@@ -18,4 +18,4 @@ getnameinfo.o: missing/getnameinfo.c
 	$(CC) -c $(CFLAGS) -I$(srcdir) $(DEFS) $(OPTFLAGS) \
 		$(srcdir)/missing/getnameinfo.c
 
-ComplexProgramTarget(wmmp3)
+ComplexProgramTarget(wmmp3play)

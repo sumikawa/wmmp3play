@@ -1,7 +1,7 @@
 /*
- * wmmp3 - An mpg123 frontend designed for WindowMaker
+ * wmmp3play - An mpg123 frontend designed for WindowMaker
  *
- * wmmp3 is Copyright (c) 1999 by Munechika SUMIKAWA and licensed
+ * wmmp3play is Copyright (c) 1999 by Munechika SUMIKAWA and licensed
  * through the GNU General Public License.  Read the COPYING file for
  * the complete GNU license.
  *
@@ -10,10 +10,10 @@
 
 #define NORMSIZE    64
 #define ASTEPSIZE   56
-#define NAME        "wmmp3"
-#define CLASS       "WMMP3"
+#define NAME        "wmmp3play"
+#define CLASS       "WMMP3PLAY"
 
-#define PLAYLIST    ".wmmp3"
+#define PLAYLIST    ".wmmp3play"
 
 #include "config.h"
 
@@ -62,7 +62,7 @@ Pixmap pm_nrec;
 Pixmap pm_alnm;
 
 /* xpm image */
-#include "XPM/wmmp3.xpm"
+#include "XPM/wmmp3play.xpm"
 #include "XPM/tile.xpm"
 #include "XPM/norec.xpm"
 #include "XPM/alpnum.xpm"	/* alphabet & number */
@@ -72,6 +72,7 @@ int wmaker = 0;
 int ushape = 0;
 int astep = 0;
 int debug = 0;
+int album = 0;
 
 /*  Variables for command-line arguments - standard */
 char mcastif[256] = "";
@@ -93,19 +94,21 @@ Window w_activewin;
 
 GC gc_gc;
 
+#define BUFSIZE 2048
+char buf[BUFSIZE];
+int fdmp3 = -1, fdtitle = -1;
+int pipefds[2];
+
 #define MAXPLAYNUM 4096
-char *namelist[MAXPLAYNUM];
+char namelist[BUFSIZE][MAXPLAYNUM];
 int playlist[MAXPLAYNUM];
+#define ALBUMSIZE 1024
+int albump[ALBUMSIZE];
 int playnum = 0;
 int curplay = 1;
 pid_t child_pid;
 char curname[8];
 char title[30];
-
-#define BUFSIZE 1024
-char buf[BUFSIZE];
-int fdmp3 = -1, fdtitle = -1;
-int pipefds[2];
 
 #define NEXT	1
 #define STOP	2
@@ -172,7 +175,7 @@ main(int argc, char **argv)
 	xpmattr.exactColors = 0;
 	xpmattr.closeness = 40000;
 	xpmattr.valuemask = XpmExactColors | XpmCloseness;
-	XpmCreatePixmapFromData(d_display, w_root, wmmp3_xpm, &pm_main,
+	XpmCreatePixmapFromData(d_display, w_root, wmmp3play_xpm, &pm_main,
 				&pm_mask, &xpmattr);
 	XpmCreatePixmapFromData(d_display, w_root, tile_xpm, &pm_tile, NULL,
 				&xpmattr);
@@ -197,6 +200,7 @@ main(int argc, char **argv)
 	XSetClipMask(d_display, gc_gc, None);
 
 	drawBtns(STOP);
+
 	gettimeofday(&tp, NULL);
 	srandom(tp.tv_usec);
 	readFile();
@@ -209,6 +213,7 @@ main(int argc, char **argv)
 	XMapWindow(d_display, w_main);
 
 	done = 0;
+
 	while (!done) {
 		while (XPending(d_display)) {
 			XNextEvent(d_display, &xev);
@@ -275,6 +280,7 @@ main(int argc, char **argv)
 			}
 		} else {
 			n = read(fdmp3, buf, sizeof(buf));
+			/* xxx: should rip ID3  tag */
 		}
 
 		/* write data */
@@ -442,7 +448,7 @@ void usage(char *prog)
 {
 #define F(x) fprintf(stderr, x)
 #define G(x, y) fprintf(stderr, x, y)
-	F("wmmp3 - An mpg123 frontend designed for WindowMaker\n");
+	F("wmmp3play - An mpg123 frontend designed for WindowMaker\n");
 	F("   Version 0.1 on $Date$\n");
 	F("   Copyright (c) 1999 by Munechika SUMIKAWA <sumikawa@kame.net>\n");
 	G("usage:\n   %s [options]\noptions:\n", prog);
@@ -473,6 +479,7 @@ scanArgs(int argc, char **argv)
 		if (strcmp(argv[i], "-s") == 0)	ushape = 1;
 		if (strcmp(argv[i], "-a") == 0)	astep = 1;
 		if (strcmp(argv[i], "-D") == 0)	debug = 1;
+		if (strcmp(argv[i], "-A") == 0)	album = 1;
 		if (strcmp(argv[i], "-u") == 0) {
 			if (i < argc - 1) {
 				i++;
@@ -504,22 +511,26 @@ readFile()
 	char rcfilen[256];
 	char buf[256];
 	int current = 1;
-	int i;
+	int i = 0;
 
 	sprintf(rcfilen, "%s/%s", getenv("HOME"), PLAYLIST);
 
-	if ((rcfile = fopen(rcfilen, "r")) == NULL)
+	if ((rcfile = fopen(rcfilen, "r")) == NULL) {
+		fprintf(stderr, "~/.wmmp3play does not exist\n");
 		exit(-1);
+	}
 
+	albump[i++] = 0;
 	while(1) {
-		fgets(buf, 250, rcfile);
+		fgets(buf, sizeof(buf), rcfile);
 		if (buf[0] == '\0')
 			continue;
 		if (feof(rcfile))
 			break;
-		if (buf[0] == '#')
+		if (buf[0] == '#') {
+			albump[i++] = current;
 			continue;
-		namelist[current] = (char *)malloc(strlen(buf));
+		}
 		memcpy(buf + strlen(buf) - 1, "\0", 1);
 		strcpy(namelist[current], buf);
 		current++;
@@ -853,9 +864,10 @@ int open_mpg123(void)
 		close(pipefds[0]);
 		close(pipefds[1]);
 		if (status & (UDP | TCP))
-			execlp("mpg123", "mpg123", "-b", "100", "-", NULL);
+			execlp("mpg123", "mpg123",
+			        "-y", "-", NULL);
 		else
-			execlp("mpg123", "mpg123", "-", NULL);
+			execlp("mpg123", "mpg123", "-y", "-", NULL);
 		perror("exec");
 		exit(1);
 	}

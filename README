@@ -1,8 +1,8 @@
-wmmp3 - An mpg123 frontend designed for WindowMaker
+wmmp3play - An mpg123 frontend designed for WindowMaker
 				Munechika SUMIKAWA <sumikawa@kame.net>
 				http://www.don.to/wmmp3/
 
-wmmp3 is copyright (c) 1999-2000 by Munechika SUMIKAWA and licensed
+wmmp3play is copyright (c) 1999-2000 by Munechika SUMIKAWA and licensed
 through the GNU General Public License.  Read the COPYING file for the
 complete GNU license.
 
@@ -11,8 +11,8 @@ INSTALL:
 
 1. install 'mpg123' at first. You can get it from 
 
-2. tar zxvf wmmp3-0.2.tar.gz
-   cd wmmp3-0.2
+2. tar zxvf wmmp3play-0.2.tar.gz
+   cd wmmp3play-0.2
    ./configure
    xmkmf
    make
@@ -22,17 +22,17 @@ INSTALL:
 --------------------------------------------------------------------
 USAGE:
 
-  1. make playlist on ~/.wmmp3
+  1. make playlist on ~/.wmmp3play
 
      e.g. mp3 files are installed on /usr/local/data/mp3
-       % find /usr/local/data/mp3 -name '*.mp3' > ~/.wmmp3
+       % find /usr/local/data/mp3 -name '*.mp3' > ~/.wmmp3play
 
      NOTE: All filenames are designated as a ABSOLUTELY path.
-           You can also designate URL in ~/.wmmp3, such as
+           You can also designate URL in ~/.wmmp3play, such as
 	   http://foo.bar.baz:8000/
 
-  2. execute wmmp3
-       % wmmp3
+  2. execute wmmp3play
+       % wmmp3play
 
   3. enjoy!
 
@@ -41,8 +41,10 @@ TODO:
   - man
   - album support
   - more cool frontend
+    print the all of ID3 tag by baloon help
   - D&D playlist and calling from netscape
   - opening message :-)
+  - use libao and libmad instead of mpg123
 
 --------------------------------------------------------------------
 KNOWN BUGS:

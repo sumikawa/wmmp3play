@@ -1,4 +1,4 @@
-AC_INIT(wmmp3.c)
+AC_INIT(wmmp3play.c)
 AC_CONFIG_HEADER(config.h)
 
 AC_CANONICAL_SYSTEM
