@@ -1,8 +1,8 @@
 wmmp3play - An mpg123 frontend designed for WindowMaker
-				Munechika SUMIKAWA <sumikawa@kame.net>
+				Munechika SUMIKAWA <sumikawa@don.to>
 				http://www.don.to/wmmp3/
 
-wmmp3play is copyright (c) 1999-2000 by Munechika SUMIKAWA and licensed
+wmmp3play is copyright (c) 1999-2003 by Munechika SUMIKAWA and licensed
 through the GNU General Public License.  Read the COPYING file for the
 complete GNU license.
 
@@ -11,8 +11,8 @@ INSTALL:
 
 1. install 'mpg123' at first. You can get it from 
 
-2. tar zxvf wmmp3play-0.2.tar.gz
-   cd wmmp3play-0.2
+2. tar zxvf wmmp3play-xxx.tar.gz
+   cd wmmp3play-xxx
    ./configure
    xmkmf
    make
@@ -44,7 +44,7 @@ TODO:
     print the all of ID3 tag by baloon help
   - D&D playlist and calling from netscape
   - opening message :-)
-  - use libao and libmad instead of mpg123
+  - use libao and libmad audio library instead of executing mpg123
 
 --------------------------------------------------------------------
 KNOWN BUGS:
@@ -53,10 +53,12 @@ KNOWN BUGS:
 --------------------------------------------------------------------
 CHANGELOG:
   0.1
-    - first release
+    - First release
   0.2
-    - confgure support
-    - networks streaming(including IPv6) support
+    - Confgure support
+    - Networks streaming(including IPv6) support
+  0.3
+    - Renamed from wmmp3
 
 --------------------------------------------------------------------
 CREDITS:
