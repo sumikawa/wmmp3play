@@ -1,17 +1,11 @@
             wmmp3play - An mpg123 frontend designed for WindowMaker
 
-                                  [wmmp3play]
-
 wmmp3play is an mpg123 frontend designed for WindowMaker.
 
 wmmp3play is copyright (c) 1999-2003 by Munechika SUMIKAWA and licensed through
 the GNU General Public License. Read the COPYING file for the complete GNU
 license.
--------------------------------------------------------------------------------
 
-Download
-
-wmmp3play version 0.3 - download
 -------------------------------------------------------------------------------
 
 INSTALL
@@ -62,9 +56,13 @@ TODO
 
 CHANGELOG
 
-  * 0.1: First Release
-  * 0.2: confgure support, networks streaming(including IPv6) support
-  * 0.3: Renamed from wmmp3
+0.1
+    First Release
+0.2
+    Support "configure"
+    Support networks streaming including IPv6
+0.3
+    Renamed from wmmp3
 
 $Id$
 -------------------------------------------------------------------------------

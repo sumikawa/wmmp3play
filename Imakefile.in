@@ -21,4 +21,4 @@ getnameinfo.o: missing/getnameinfo.c
 ComplexProgramTarget(wmmp3play)
 
 README::
-	w3m -S http://www.don.to/wmmp3play/ | sed 's/  *$$//' | uniq > README
+	w3m -S http://www.don.to/wmmp3play/ | grep -v "\[wmmp3play\]" | grep -i -v download | sed 's/  *$$//' | uniq > README
