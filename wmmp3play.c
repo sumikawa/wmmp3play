@@ -1086,16 +1086,20 @@ get_url(char *string, char *addr, char *port, char *port2)
 		strcpy(port, mark);
 		if (port2 != NULL) {
 			if ((mark = strchr(mark, ':')) == NULL) {
-				strcpy(port, "8001");
+				strcpy(port2, "8001");
 			} else {
 				*mark = '\0';
 				mark++;
-				strcpy(port, mark);
+				strcpy(port2, mark);
 			}
 		}
 	}
-		
 	strcpy(addr, tmp);
+
+	if (debug)
+		fprintf(stderr, "addr=%s, port1=%s, port2=%s\n",
+			addr, port, port2);
+	
 	return(0);
 }
 
