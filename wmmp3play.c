@@ -97,7 +97,7 @@ char title[30];
 
 #define BUFSIZE 8192
 char buf[BUFSIZE];
-int fdmp3, fdtitle;
+int fdmp3 = -1, fdtitle = -1;
 int pipefds[2];
 
 #define NEXT	1
@@ -235,7 +235,7 @@ main(int argc, char **argv)
 
 			FD_ZERO(&readfds);
 			FD_SET(fdmp3, &readfds);
-			if (status & TITLE) {
+			if (status & TITLE && fdtitle != -1) {
 				FD_SET(fdtitle, &readfds);
 				if (fdtitle > nfds)
 					nfds = fdtitle;
@@ -256,9 +256,11 @@ main(int argc, char **argv)
 				goto alreadywait;
 			default:
 				if (status & TITLE &&
+				    fdtitle != -1 &&
 				    FD_ISSET(fdtitle, &readfds))
 					recv_title();
-				if (FD_ISSET(fdmp3, &readfds))
+				if (fdmp3 != -1 &&
+				    FD_ISSET(fdmp3, &readfds))
 					n = recv(fdmp3, buf, sizeof(buf), 0);
 				break;
 			}
@@ -809,9 +811,13 @@ sig_child(int sig)
 	if (debug)
 		fprintf(stderr, "sig_child()\n");
 
-	fdmp3 = -1;
 	pid = wait3(&status, WNOHANG, (struct rusage *)0);
-	usleep(1000000);
+	if (debug)
+		fprintf(stderr, "*** status = %x\n", status);
+	if (!WEXITSTATUS(status) && !WTERMSIG(status))
+		return;
+	fdmp3 = -1;
+	sleep(2);
 	open_mpg123();
 	if (!(status & (UDP | TCP) && fdmp3 != -1))
 		lseek(fdmp3, 0, SEEK_SET);
@@ -1219,5 +1225,7 @@ stop2play(void)
 {
 	status &= ~STOP;
 	status |= PLAY;
+	if (debug)
+		fprintf(stderr, "fdtitle = %d, fdmp3 = %d\n", fdtitle, fdmp3);
 	open_mpg123();
 }
