@@ -1,5 +1,5 @@
 /* XPM */
-static char const* alpnum_xpm[] = {
+static char * alpnum_xpm[] = {
 "160 19 13 1",
 " 	c None",
 ".	c #0000FF",
