@@ -9,10 +9,11 @@ complete GNU license.
 --------------------------------------------------------------------
 INSTALL:
 
-1. install 'mpg123' at first. You can get it from http://mpg.123.org/
+1. install 'mpg123' at first. You can get it from 
 
-2. tar zxvf wmmp3-0.1.tar.gz
-   cd wmmp3-0.1
+2. tar zxvf wmmp3-0.2.tar.gz
+   cd wmmp3-0.2
+   ./configure
    xmkmf
    make
    su
@@ -51,6 +52,9 @@ KNOWN BUGS:
 CHANGELOG:
   0.1
     - first release
+  0.2
+    - confgure support
+    - networks streaming(including IPv6) support
 
 --------------------------------------------------------------------
 CREDITS:
