@@ -1,4 +1,4 @@
-wmmp3 - mpg123 user-interface designed for WindowMaker
+wmmp3 - mpg123 frontend designed for WindowMaker
 				Munechika SUMIKAWA <sumikawa@kame.net>
 				http://www.kame.net/~sumikawa/
 
@@ -6,7 +6,7 @@ wmmp3 is copyright (c) 1999 by Munechika SUMIKAWA and licensed through
 the GNU General Public License.  Read the COPYING file for the
 complete GNU license.
 
-This program based upon code wriiten by:
+This program based on the code wriiten by:
 	wmmixer - A mixer designed for WindowMaker
 	05/09/98  Release 1.0 Beta1
 	Copyright (C) 1998  Sam Hawker <shawkie@geocities.com>
@@ -18,24 +18,38 @@ And, alphabet and numeric XPMs from:
 --------------------------------------------------------------------
 INSTALL:
 
-1. you must install mpg123
+1. install 'mpg123' first. See, http://mpg.123.org/
 
-2. xmkmf
+2. tar zxvf wmmp3-0.1.tar.gz
+   cd wmmp3-0.1
+   xmkmf
    make
+   su
    make install
-
---------------------------------------------------------------------
-CONFIGURATION:
-
-1. you must make playlist into $(HOME)/.wmmp3
-   all file names are designated as a full-path.
-
-   e.g. mp3 files are installed on /usr/local/data/mp3
-     find /usr/local/data/mp3 -name '*.mp3' > $(HOME)/.wmmp3
 
 --------------------------------------------------------------------
 USAGE:
 
-1. exec wmmp3
+  1. make playlist on ~/.wmmp3
+
+     NOTE: All filenames are designated as a ABSOLUTELY path.
+
+     e.g. mp3 files are installed on /usr/local/data/mp3
+       find /usr/local/data/mp3 -name '*.mp3' > ~/.wmmp3
+
+  2. execute wmmp3
+       % wmmp3
+
+  3. enjoy!
 
 --------------------------------------------------------------------
+TODO:
+  - print a music tile from ID instead of a filename.
+  - album support
+  - more cool frontend
+  - opening message
+
+--------------------------------------------------------------------
+CHANGELOG:
+  0.1
+    - first release
