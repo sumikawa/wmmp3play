@@ -280,7 +280,7 @@ main(int argc, char **argv)
 			}
 		} else {
 			n = read(fdmp3, buf, sizeof(buf));
-			/* xxx: should rip ID3  tag */
+			/* xxx: must rip ID3 tag */
 		}
 
 		/* write data */
@@ -476,10 +476,10 @@ scanArgs(int argc, char **argv)
 			exit(0);
 		}
 		if (strcmp(argv[i], "-w") == 0) wmaker = 1;
-		if (strcmp(argv[i], "-s") == 0)	ushape = 1;
-		if (strcmp(argv[i], "-a") == 0)	astep = 1;
-		if (strcmp(argv[i], "-D") == 0)	debug = 1;
-		if (strcmp(argv[i], "-A") == 0)	album = 1;
+		if (strcmp(argv[i], "-s") == 0) ushape = 1;
+		if (strcmp(argv[i], "-a") == 0) astep = 1;
+		if (strcmp(argv[i], "-D") == 0) debug = 1;
+		if (strcmp(argv[i], "-A") == 0) album = 1;
 		if (strcmp(argv[i], "-u") == 0) {
 			if (i < argc - 1) {
 				i++;
