@@ -153,7 +153,7 @@ main(int argc, char **argv)
 	XpmAttributes xpmattr;
 	XEvent xev;
 	int done, n;
-	struct timeval *tp;
+	struct timeval tp;
 
 	scanArgs(argc, argv);
 	initXWin(argc, argv);
@@ -191,8 +191,8 @@ main(int argc, char **argv)
 	XSetClipMask(d_display, gc_gc, None);
 
 	drawBtns(STOP);
-	gettimeofday(tp, NULL);
-	srandom(tp->tv_sec);
+	gettimeofday(&tp, NULL);
+	srandom(tp.tv_sec);
 	readFile();
 
 	open_music(1, 0);
