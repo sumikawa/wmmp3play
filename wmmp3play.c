@@ -93,7 +93,7 @@ Window w_activewin;
 
 GC gc_gc;
 
-#define MAXPLAYNUM 1024
+#define MAXPLAYNUM 4096
 char *namelist[MAXPLAYNUM];
 int playlist[MAXPLAYNUM];
 int playnum = 0;
@@ -198,7 +198,7 @@ main(int argc, char **argv)
 
 	drawBtns(STOP);
 	gettimeofday(&tp, NULL);
-	srandom(tp.tv_sec);
+	srandom(tp.tv_usec);
 	readFile();
 
 	open_music(1, 0);
@@ -817,7 +817,6 @@ sig_child(int sig)
 {
 	int status;
 	pid_t pid;
-	int dummy;
 
 	if (debug)
 		fprintf(stderr, "sig_child()\n");
@@ -957,7 +956,6 @@ get_title(void)
 void
 recv_title(void)
 {
-	int temp;
 	struct {
 		char tag[3];
 		char title[30];
