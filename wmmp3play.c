@@ -819,7 +819,7 @@ sig_child(int sig)
 	fdmp3 = -1;
 	sleep(2);
 	open_mpg123();
-	if (!(status & (UDP | TCP) && fdmp3 != -1))
+	if (!(status & (UDP | TCP)) && fdmp3 != -1)
 		lseek(fdmp3, 0, SEEK_SET);
 }
 
