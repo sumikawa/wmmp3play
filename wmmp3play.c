@@ -215,7 +215,7 @@ main(int argc, char **argv)
 			}
 		}
 
-		if (status & STOP)
+		if ((status & STOP) || fdmp3 == -1)
 			goto jump;
 
 		/* read data */
