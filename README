@@ -49,6 +49,7 @@ USAGE:
 
 --------------------------------------------------------------------
 TODO:
+  - man
   - print a music tile from ID instead of a filename.
   - album support
   - more cool frontend
