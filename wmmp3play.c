@@ -547,6 +547,8 @@ readFile()
 void 
 pressEvent(XButtonEvent * xev)
 {
+	int oldstatus = status;
+	
 	int x = xev->x - (winsize / 2 - 32);
 	int y = xev->y - (winsize / 2 - 32);
 	if (x >= 6 && y >= 33 && x <= 18 && y <= 43) {
@@ -556,6 +558,12 @@ pressEvent(XButtonEvent * xev)
 			curplay = playnum - 1;
 		makecurname(1);
 		open_music(curplay, 1);
+		if (((oldstatus & (UDP | TCP)) && !(status & (UDP | TCP))) ||
+		    (!(oldstatus & (UDP | TCP)) && (status & (UDP | TCP)))) {
+			/* change buffer size */
+			play2stop();
+			stop2play();
+		}
 		btnstate |= PREV;
 		drawBtns(PREV);
 		btnstate &= ~PREV;
@@ -574,9 +582,7 @@ pressEvent(XButtonEvent * xev)
 		return;
 	}
 	if (x >= 32 && y >= 33 && x <= 44 && y <= 43) {
-		int oldstatus;
 		/* play */
-		oldstatus = status;
 		stop2play();
 		btnstate |= PLAY;
 		drawBtns(PLAY);
@@ -591,6 +597,12 @@ pressEvent(XButtonEvent * xev)
 			curplay = 1;
 		makecurname(1);
 		open_music(curplay, 1);
+		if (((oldstatus & (UDP | TCP)) && !(status & (UDP | TCP))) ||
+		    (!(oldstatus & (UDP | TCP)) && (status & (UDP | TCP)))) {
+			/* change buffer size */
+			play2stop();
+			stop2play();
+		}
 		btnstate |= NEXT;
 		drawBtns(NEXT);
 		btnstate &= ~NEXT;
@@ -824,7 +836,10 @@ int open_mpg123(void)
 		dup(pipefds[0]);
 		close(pipefds[0]);
 		close(pipefds[1]);
-		execlp("mpg123", "mpg123", "-b", "100", "-", NULL);
+		if (status & (UDP | TCP))
+			execlp("mpg123", "mpg123", "-b", "100", "-", NULL);
+		else
+			execlp("mpg123", "mpg123", "-", NULL);
 		perror("exec");
 		exit(1);
 	}
