@@ -1,15 +1,15 @@
 wmmp3 - An mpg123 frontend designed for WindowMaker
 				Munechika SUMIKAWA <sumikawa@kame.net>
-				http://www.kame.net/~sumikawa/wmmp3/
+				http://www.don.to/wmmp3/
 
-wmmp3 is copyright (c) 1999 by Munechika SUMIKAWA and licensed through
-the GNU General Public License.  Read the COPYING file for the
+wmmp3 is copyright (c) 1999-2000 by Munechika SUMIKAWA and licensed
+through the GNU General Public License.  Read the COPYING file for the
 complete GNU license.
 
 --------------------------------------------------------------------
 INSTALL:
 
-1. install 'mpg123' first. See, http://mpg.123.org/
+1. install 'mpg123' at first. You can get it from http://mpg.123.org/
 
 2. tar zxvf wmmp3-0.1.tar.gz
    cd wmmp3-0.1
@@ -27,7 +27,8 @@ USAGE:
        % find /usr/local/data/mp3 -name '*.mp3' > ~/.wmmp3
 
      NOTE: All filenames are designated as a ABSOLUTELY path.
-           And you can also designate URL in ~/.wmmp3
+           You can also designate URL in ~/.wmmp3, such as
+	   http://foo.bar.baz:8000/
 
   2. execute wmmp3
        % wmmp3
@@ -37,14 +38,15 @@ USAGE:
 --------------------------------------------------------------------
 TODO:
   - man
-  - print a music tile from ID instead of a filename.
   - album support
   - more cool frontend
-  - opening message
+  - D&D playlist and calling from netscape
+  - autoconf
+  - opening message :-)
 
 --------------------------------------------------------------------
 KNOWN BUGS:
-  - there are some problems on signal handling
+  - there are some problems in signal handling
 
 --------------------------------------------------------------------
 CHANGELOG:
