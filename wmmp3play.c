@@ -8,9 +8,6 @@
  * $Id$
  */
 
-#define WINDOWMAKER 0
-#define USESHAPE    0
-#define AFTERSTEP   0
 #define NORMSIZE    64
 #define ASTEPSIZE   56
 #define NAME        "wmmp3"
@@ -43,6 +40,11 @@
 #include <X11/xpm.h>
 #include <X11/extensions/shape.h>
 
+/* obsolete define for joing multicast group */
+#ifndef IPV6_JOIN_GROUP
+#define IPV6_JOIN_GROUP IPV6_ADD_MEMBERSHIP
+#endif
+
 /* pixmapas */
 Pixmap pm_main;
 Pixmap pm_tile;
@@ -58,10 +60,13 @@ Pixmap pm_alnm;
 #include "XPM/norec.xpm"
 #include "XPM/alpnum.xpm"	/* alphabet & number */
 
+/* options */
+int wmaker = 0;
+int ushape = 0;
+int astep = 0;
+int debug = 0;
+
 /*  Variables for command-line arguments - standard */
-int wmaker = WINDOWMAKER;
-int ushape = USESHAPE;
-int astep = AFTERSTEP;
 char mcastif[256] = "";
 char servaddr[256] = "";
 char servport[256] = "";
@@ -434,6 +439,7 @@ void usage(char *prog)
 	F("   -a                   use smaller window    (for AfterStep Wharf)\n");
 	F("   -position position   set window position   (see X manual pages)\n");
 	F("   -display display     select target display (see X manual pages)\n");
+	F("   -D                   debug mode\n");
 #undef F
 #undef G
 }
@@ -450,12 +456,10 @@ scanArgs(int argc, char **argv)
 			usage(rindex(argv[0], '/') + 1);
 			exit(0);
 		}
-		if (strcmp(argv[i], "-w") == 0)
-			wmaker = !wmaker;
-		if (strcmp(argv[i], "-s") == 0)
-			ushape = !ushape;
-		if (strcmp(argv[i], "-a") == 0)
-			astep = !astep;
+		if (strcmp(argv[i], "-w") == 0) wmaker = 1;
+		if (strcmp(argv[i], "-s") == 0)	ushape = 1;
+		if (strcmp(argv[i], "-a") == 0)	astep = 1;
+		if (strcmp(argv[i], "-D") == 0)	debug = 1;
 		if (strcmp(argv[i], "-u") == 0) {
 			if (i < argc - 1) {
 				i++;
@@ -496,6 +500,8 @@ readFile()
 
 	while(1) {
 		fgets(buf, 250, rcfile);
+		if (buf[0] == '\0')
+			continue;
 		if (feof(rcfile))
 			break;
 		if (buf[0] == '#')
@@ -788,6 +794,9 @@ sig_child(int sig)
 	pid_t pid;
 	int dummy;
 
+	if (debug)
+		fprintf(stderr, "sig_child()\n");
+
 	fdmp3 = -1;
 	pid = wait3(&status, WNOHANG, (struct rusage *)0);
 	usleep(1000000);
@@ -808,6 +817,10 @@ int open_mpg123(void)
 	if (child_pid == 0) {
 		/* child process */
 		close(0);
+		if (!debug) {
+			close(1);
+			close(2);
+		}
 		dup(pipefds[0]);
 		close(pipefds[0]);
 		close(pipefds[1]);
