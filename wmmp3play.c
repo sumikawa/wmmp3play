@@ -80,7 +80,6 @@ Window w_root;
 Window w_activewin;
 
 GC gc_gc;
-unsigned long color[4];
 
 #define MAXPLAYNUM 1024
 char *namelist[MAXPLAYNUM];
@@ -146,12 +145,6 @@ main(int argc, char **argv)
 	XGCValues gcv;
 	unsigned long gcm;
 	XpmAttributes xpmattr;
-	XpmColorSymbol xpmcsym[4] = {
-		{"back_color", NULL, color[0]},
-		{"led_color_high", NULL, color[1]},
-		{"led_color_med", NULL, color[2]},
-		{"led_color_low", NULL, color[3]}
-	};
 	XEvent xev;
 	int done, n;
 
@@ -163,10 +156,9 @@ main(int argc, char **argv)
 	gc_gc = XCreateGC(d_display, w_root, gcm, &gcv);
 
 	xpmattr.numsymbols = 4;
-	xpmattr.colorsymbols = xpmcsym;
 	xpmattr.exactColors = 0;
 	xpmattr.closeness = 40000;
-	xpmattr.valuemask = XpmColorSymbols | XpmExactColors | XpmCloseness;
+	xpmattr.valuemask = XpmExactColors | XpmCloseness;
 	XpmCreatePixmapFromData(d_display, w_root, wmmp3_xpm, &pm_main,
 				&pm_mask, &xpmattr);
 	XpmCreatePixmapFromData(d_display, w_root, tile_xpm, &pm_tile, NULL,
@@ -223,11 +215,10 @@ main(int argc, char **argv)
 			}
 		}
 
-		if (!(status & PLAY)) {
-			usleep(50000);
+		if (status & STOP)
 			goto jump;
-		}
-		
+
+		/* read data */
 		if (status & (UDP | TCP)) {
 			struct timeval tv;
 			fd_set readfds;
@@ -254,44 +245,47 @@ main(int argc, char **argv)
 					makecurname(1);
 					play2stop();
 				}
-				usleep(50000);
 				goto jump;
 			case 0:
 				/* time out */
-				goto jump;
+				goto alreadywait;
 			default:
 				if (status & TITLE &&
 				    FD_ISSET(fdtitle, &readfds))
 					recv_title();
 				if (FD_ISSET(fdmp3, &readfds))
 					n = recv(fdmp3, buf, sizeof(buf), 0);
-				usleep(50000);
 				break;
 			}
 		} else {
 			n = read(fdmp3, buf, sizeof(buf));
-			usleep(50000);
 		}
 
-		if ((n == -1) &&
-		    (errno != EAGAIN) && (errno != EINTR)) {
-			strcpy(title, "Error in read");
-			makecurname(1);
-			play2stop();
-			goto jump;
-		}
-		if (n == 0) {
+		/* write data */
+		switch (n) {
+		case -1:
+			if ((errno != EAGAIN) && (errno != EINTR)) {
+				strcpy(title, "Error in read");
+				makecurname(1);
+				play2stop();
+			}
+			break;
+		case 0:
 			/* EOF */
 			curplay++;
 			if (curplay >= playnum)
 				curplay = 1;
 			open_music(curplay, 1);
 			makecurname(1);
+			break;
+		default:
+			write(pipefds[1], buf, n);
 		}
-		write(pipefds[1], buf, n);
-		errno = 0;
 
 	jump:
+		usleep(50000);
+
+	alreadywait:
 		if (++count > 4) {
 			makecurname(0);
 			count = 0;
@@ -565,6 +559,10 @@ pressEvent(XButtonEvent * xev)
 		/* stop */
 		if (status & PLAY)
 			play2stop();
+		if (status & TITLE) {
+			strcpy(title, namelist[playlist[curplay]]);
+			makecurname(1);
+		}
 		btnstate |= STOP;
 		drawBtns(STOP);
 		return;
@@ -741,7 +739,7 @@ void open_music(int num, int cl)
 		close(fdmp3);
 
 	if (strncmp(namelist[playlist[curplay]], "http://", 7) == 0) {
-		status &= (UDP | TITLE);
+		status &= ~(UDP | TITLE);
 		status |= TCP;
 		strcpy(title, namelist[playlist[curplay]]);
 		get_url(namelist[playlist[curplay]] + 7, servaddr, servport,
@@ -752,7 +750,7 @@ void open_music(int num, int cl)
 			play2stop();
 		}
 	} else if (strncmp(namelist[playlist[curplay]], "udp://", 6) == 0) {
-		status &= (TCP | TITLE);
+		status &= ~(TCP | TITLE);
 		status |= UDP;
 		strcpy(title, namelist[playlist[curplay]]);
 		get_url(namelist[playlist[curplay]] + 6, servaddr, servport,
@@ -761,7 +759,7 @@ void open_music(int num, int cl)
 		if (fdmp3 == -1)
 			play2stop();
 	} else if (strncmp(namelist[playlist[curplay]], "title://", 8) == 0) {
-		status &= TCP;
+		status &= ~TCP;
 		status |= (UDP | TITLE);
 		strcpy(title, namelist[playlist[curplay]]);
 		get_url(namelist[playlist[curplay]] + 8, servaddr, servport,
@@ -790,9 +788,9 @@ sig_child(int sig)
 	pid_t pid;
 	int dummy;
 
+	fdmp3 = -1;
 	pid = wait3(&status, WNOHANG, (struct rusage *)0);
 	usleep(1000000);
-	fprintf(stderr, "********* sig_child\n");
 	open_mpg123();
 	if (!(status & (UDP | TCP) && fdmp3 != -1))
 		lseek(fdmp3, 0, SEEK_SET);
@@ -1175,11 +1173,8 @@ void next_frame(void)
 		pos++;
 	}
   
-	if (pos != BUFSIZE) {
-		fprintf(stderr, "***** %d: %x %x\n",
-			pos, buf[pos], buf[pos+1]);
+	if (pos != BUFSIZE)
 		write(pipefds[1], buf + pos, n - pos);
-	}
 }
 
 void
