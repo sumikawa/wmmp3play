@@ -53,7 +53,7 @@
 #include <ctype.h>
 #include <unistd.h>
 
-#include "lib/addrinfo.h"
+#include "addrinfo.h"
 
 #if defined(__KAME__) && defined(INET6)
 # define FAITH

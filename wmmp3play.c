@@ -15,6 +15,8 @@
 
 #define PLAYLIST    ".wmmp3"
 
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,6 +35,10 @@
 #include <err.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+
+#ifndef HAVE_GETADDRINFO
+#include "missing/addrinfo.h"
+#endif
 
 #include <X11/X.h>
 #include <X11/Xlib.h>
@@ -1007,7 +1013,9 @@ int
 open_socket(char *addr, char *port, int socktype) {
 	struct addrinfo hints, *res0, *res;
 	int error;
+#ifdef INET6
 	struct ipv6_mreq mreq;
+#endif
 	int intface;
 	int recvsock;
 	memset(&hints, 0, sizeof(hints));
@@ -1052,6 +1060,7 @@ open_socket(char *addr, char *port, int socktype) {
 				return(-1);
 			}
 
+#ifdef INET6
 			intface = if_nametoindex(mcastif);
 			mreq.ipv6mr_multiaddr =
 				((struct sockaddr_in6 *)res->ai_addr)->sin6_addr;
@@ -1061,6 +1070,8 @@ open_socket(char *addr, char *port, int socktype) {
 				strcpy(title, "can't setsockopt");
 				return(-1);
 			}
+#endif
+			/* xxx IPv4? */
 		}
 		return(recvsock);
 	}

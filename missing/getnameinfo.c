@@ -44,7 +44,7 @@
 #include <string.h>
 #include <stddef.h>
 
-#include "lib/addrinfo.h"
+#include "addrinfo.h"
 
 #define SUCCESS 0
 #define ANY 0

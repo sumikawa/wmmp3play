@@ -1,10 +1,21 @@
+srcdir=	@srcdir@
+
 XPMLIB = -lXpm
 DEPLIBS = $(DEPXLIB)
 CCOPTIONS = @CFLAGS@
 LOCAL_LDFLAGS = @LDFLAGS@
 LOCAL_LIBRARIES = $(XPMLIB) $(XLIB) @LDFLAGS@ @LIBS@
+LIBOBJS=	@LIBOBJS@
 
 SRCS = wmmp3.c
-OBJS = wmmp3.o
+OBJS = wmmp3.o ${LIBOBJS}
+
+# missing libraries
+getaddrinfo.o: missing/getaddrinfo.c
+	$(CC) -c $(CFLAGS) -I$(srcdir) $(DEFS) $(OPTFLAGS) \
+		$(srcdir)/missing/getaddrinfo.c
+getnameinfo.o: missing/getnameinfo.c
+	$(CC) -c $(CFLAGS) -I$(srcdir) $(DEFS) $(OPTFLAGS) \
+		$(srcdir)/missing/getnameinfo.c
 
 ComplexProgramTarget(wmmp3)

@@ -30,7 +30,6 @@ AC_ARG_ENABLE(ipv6,
 #include <sys/socket.h>
 main()
 {
-  exit(0);
  if (socket(AF_INET6, SOCK_STREAM, 0) < 0)
    exit(1);
  else
@@ -163,7 +162,7 @@ if test "$ipv6" = "yes" -a "$ipv6lib" != "none"; then
 	fi
 fi
 
-
+AC_REPLACE_FUNCS(getaddrinfo getnameinfo)
 AC_MSG_CHECKING(getaddrinfo bug)
 AC_TRY_RUN([
 #include <sys/types.h>
@@ -251,6 +250,7 @@ main()
   exit(1);
 }
 ],
+
 AC_MSG_RESULT(good)
 buggygetaddrinfo=no,
 AC_MSG_RESULT(buggy)
@@ -269,7 +269,6 @@ if test "$buggygetaddrinfo" = "yes"; then
 		echo '         of GNU C library (aka glibc).'
 	fi
 fi
-AC_REPLACE_FUNCS(getaddrinfo getnameinfo)
 
 AC_MSG_CHECKING([whether struct sockaddr has sa_len])
 AC_TRY_COMPILE([
