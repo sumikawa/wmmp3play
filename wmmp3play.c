@@ -91,7 +91,7 @@ pid_t child_pid;
 char curname[8];
 char title[30];
 
-#define BUFSIZE 4096
+#define BUFSIZE 8192
 char buf[BUFSIZE];
 int fdmp3, fdtitle;
 int pipefds[2];
@@ -135,6 +135,9 @@ void recv_title(void);
 void sig_child(int);
 int get_url(char *, char *, char *, char *);
 void get_head(void);
+void next_frame(void);
+void stop2play(void);
+void play2stop(void);
 
 int 
 main(int argc, char **argv)
@@ -192,12 +195,7 @@ main(int argc, char **argv)
 	srandomdev();
 	readFile();
 
-	open_mpg123();
 	open_music(1, 0);
-
-#if 0
-	strcpy(title, "wmmp3");
-#endif
 	makecurname(1);
 
 	XSelectInput(d_display, w_activewin, ExposureMask | ButtonPressMask |
@@ -254,8 +252,7 @@ main(int argc, char **argv)
 				if ((errno != EAGAIN) && (errno != EINTR)) {
 					strcpy(title, "Error in read");
 					makecurname(1);
-					status &= ~PLAY;
-					status |= STOP;
+					play2stop();
 				}
 				usleep(50000);
 				goto jump;
@@ -280,8 +277,7 @@ main(int argc, char **argv)
 		    (errno != EAGAIN) && (errno != EINTR)) {
 			strcpy(title, "Error in read");
 			makecurname(1);
-			status &= ~PLAY;
-			status |= STOP;
+			play2stop();
 			goto jump;
 		}
 		if (n == 0) {
@@ -289,8 +285,8 @@ main(int argc, char **argv)
 			curplay++;
 			if (curplay >= playnum)
 				curplay = 1;
-			makecurname(1);
 			open_music(curplay, 1);
+			makecurname(1);
 		}
 		write(pipefds[1], buf, n);
 		errno = 0;
@@ -567,8 +563,8 @@ pressEvent(XButtonEvent * xev)
 	}
 	if (x >= 19 && y >= 33 && x <= 31 && y <= 43) {
 		/* stop */
-		status |= STOP;
-		status &= ~PLAY;
+		if (status & PLAY)
+			play2stop();
 		btnstate |= STOP;
 		drawBtns(STOP);
 		return;
@@ -577,8 +573,7 @@ pressEvent(XButtonEvent * xev)
 		int oldstatus;
 		/* play */
 		oldstatus = status;
-		status |= PLAY;
-		status &= ~STOP;
+		stop2play();
 		btnstate |= PLAY;
 		drawBtns(PLAY);
 		if (oldstatus & STOP && status & TCP)
@@ -694,6 +689,9 @@ update()
 		else if (curname[i] == '_')
 			XCopyArea(d_display, pm_alnm, pm_disp, gc_gc,
 				  14 * 6,  0, 7, 9, x, 13);
+		else if (curname[i] == '-')
+			XCopyArea(d_display, pm_alnm, pm_disp, gc_gc,
+				  15 * 6,  0, 7, 9, x, 13);
 		else
 			XCopyArea(d_display, pm_alnm, pm_disp, gc_gc,
 				  10 * 6,  0,  7, 9, x, 13);
@@ -751,10 +749,8 @@ void open_music(int num, int cl)
 		fdmp3 = open_socket(servaddr, servport, SOCK_STREAM);
 		if (fdmp3 == -1) {
 			strcpy(title, "file not found");
-			status &= ~PLAY;
-			status |= STOP;
+			play2stop();
 		}
-		return;
 	} else if (strncmp(namelist[playlist[curplay]], "udp://", 6) == 0) {
 		status &= (TCP | TITLE);
 		status |= UDP;
@@ -762,11 +758,8 @@ void open_music(int num, int cl)
 		get_url(namelist[playlist[curplay]] + 6, servaddr, servport,
 			NULL);
 		fdmp3 = open_socket(servaddr, servport, SOCK_DGRAM);
-		if (fdmp3 == -1) {
-			status &= ~PLAY;
-			status |= STOP;
-		}
-		return;
+		if (fdmp3 == -1)
+			play2stop();
 	} else if (strncmp(namelist[playlist[curplay]], "title://", 8) == 0) {
 		status &= TCP;
 		status |= (UDP | TITLE);
@@ -775,22 +768,19 @@ void open_music(int num, int cl)
 			titleport);
 		fdmp3 = open_socket(servaddr, servport, SOCK_DGRAM);
 		fdtitle = open_socket(servaddr, titleport, SOCK_DGRAM);
-		if (fdmp3 == -1) {
-			status &= ~PLAY;
-			status |= STOP;
-		}
-		return;
+		if (fdmp3 == -1 || fdtitle == -1)
+			play2stop();
 	} else {
 		/* file */
 		status &= ~(UDP | TCP | TITLE);
 		fdmp3 = open(namelist[playlist[curplay]], O_RDONLY, 0);
 		if (fdmp3 == -1) {
 			strcpy(title, "file not found");
-			status &= ~PLAY;
-			status |= STOP;
+			play2stop();
 		} else
 			get_title();
 	}
+	makecurname(1);
 }
 
 void
@@ -802,13 +792,7 @@ sig_child(int sig)
 
 	pid = wait3(&status, WNOHANG, (struct rusage *)0);
 	usleep(1000000);
-#if 0
-	fprintf(stderr, "*********8sig_child\n");
-	if (pid && status) {
-		fprintf(stderr, "sig_child: child %d exit status 0x%x\n", pid,
-			status);
-	}
-#endif
+	fprintf(stderr, "********* sig_child\n");
 	open_mpg123();
 	if (!(status & (UDP | TCP) && fdmp3 != -1))
 		lseek(fdmp3, 0, SEEK_SET);
@@ -821,6 +805,7 @@ int open_mpg123(void)
 		exit(1);
 	}
 
+	signal(SIGCHLD, SIG_DFL);
 	child_pid = fork();
 	if (child_pid == 0) {
 		/* child process */
@@ -828,19 +813,23 @@ int open_mpg123(void)
 		dup(pipefds[0]);
 		close(pipefds[0]);
 		close(pipefds[1]);
-		execlp("mpg123", "mpg123", "-", NULL);
+		execlp("mpg123", "mpg123", "-b", "100", "-", NULL);
 		perror("exec");
 		exit(1);
-	} else {
-		/* parent process */
-		if (child_pid == -1) {
-			fprintf(stderr, "can't fork");
-			exit(1);
-		}
-		close(pipefds[0]);
- 		signal(SIGCHLD, sig_child);
-		return(0);
 	}
+
+	/* parent process */
+	if (child_pid == -1) {
+		fprintf(stderr, "can't fork");
+		exit(1);
+	}
+	close(pipefds[0]);
+	signal(SIGCHLD, sig_child);
+
+	if ((fdmp3 != -1) && (status & UDP))
+		next_frame();
+
+	return(0);
 }
 
 void makecurname(int newp)
@@ -850,10 +839,6 @@ void makecurname(int newp)
 	strcpy(curname, "       ");
 
 	if (newp) {
-		update();
-		repaint();
-		usleep(50000);
-
 		offset = 0;
 		zerotimer = 0;
 	} else {
@@ -866,11 +851,6 @@ void makecurname(int newp)
 			offset++;
 		if (offset >= strlen(title) || 7 >= strlen(title))
 			offset = 0;
-#ifdef 0
-		if (status & STOP)
-			offset = 0;
-#endif
-
 	}
 
 	strncpy(curname, title + offset, 7);
@@ -965,13 +945,13 @@ recv_title(void)
 				break;
 		}
 		if (song.title[i] == 0)
-			strcpy(title, "Unknwon");
+			strcpy(title, "Unknown");
 		strncpy(newtitle, song.title, 30);
 		for (i = 0; i < 30; i++) {
 			/* non-english? */
 			if (song.title[i] == 0) {
 				if (i == 0)
-					strcpy(newtitle, "Unknwon");
+					strcpy(newtitle, "Unknown");
 				else
 					break;
 			}
@@ -983,7 +963,6 @@ recv_title(void)
 	if (strcmp(newtitle, title) != 0) {
 		strcpy(title, newtitle);
 		makecurname(1);
-		update();
 	}
 }
 
@@ -1032,8 +1011,7 @@ open_socket(char *addr, char *port, int socktype) {
 			if (mcastif[0] == '\0') {
 				strcpy(title,
 				       "IF is not specified, use -u option");
-				status &= ~PLAY;
-				status |= STOP;
+				play2stop();
 				return(-1);
 			}
 
@@ -1140,8 +1118,7 @@ void get_head(void)
 		if (len <= 0 && errno != EAGAIN) {
 			strcpy(title, "Error in read");
 			makecurname(1);
-			status &= ~PLAY;
-			status |= STOP;
+			play2stop();
 		}
 		if (len > 0)
 			n += len;
@@ -1171,4 +1148,53 @@ void get_head(void)
 		n = strip_shout_header(header, n);
 	
 	write(pipefds[1], buf, n);
+}
+
+void next_frame(void)
+{
+	int n = 0, pos = 0;
+	
+	while (n != BUFSIZE) {
+		int len;
+		errno = 0;
+
+		len = recv(fdmp3, buf + n, BUFSIZE - n, 0);
+		if (len <= 0 && errno != EAGAIN) {
+			strcpy(title, "Error in read");
+			makecurname(1);
+			play2stop();
+		}
+		if (len > 0)
+			n += len;
+	}
+
+	while (pos < BUFSIZE) {
+		if ((buf[pos] & 0xff) == 0xff &&
+		    (buf[pos + 1] & 0xf0) == 0xf0)
+			break;
+		pos++;
+	}
+  
+	if (pos != BUFSIZE) {
+		fprintf(stderr, "***** %d: %x %x\n",
+			pos, buf[pos], buf[pos+1]);
+		write(pipefds[1], buf + pos, n - pos);
+	}
+}
+
+void
+play2stop(void)
+{
+	status &= ~PLAY;
+	status |= STOP;
+	signal(SIGCHLD, SIG_DFL);
+	close(pipefds[1]);
+}
+	
+void
+stop2play(void)
+{
+	status &= ~STOP;
+	status |= PLAY;
+	open_mpg123();
 }
