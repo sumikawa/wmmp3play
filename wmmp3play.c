@@ -279,9 +279,11 @@ main(int argc, char **argv)
 			break;
 		case 0:
 			/* EOF */
-			curplay++;
-			if (curplay >= playnum)
-				curplay = 1;
+			if (!(status & REPEAT)) {
+				curplay++;
+				if (curplay >= playnum)
+					curplay = 1;
+			}
 			open_music(curplay, 1);
 			makecurname(1);
 			break;
